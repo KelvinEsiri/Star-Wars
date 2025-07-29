@@ -298,6 +298,7 @@ type "logs\nlog-AspNetCore-own-2025-07-29.log"
 ## 📞 Support
 
 - kelvinesiri@gmail.com
+- https://www.linkedin.com/in/kelvinesiri
 
 ---
 
