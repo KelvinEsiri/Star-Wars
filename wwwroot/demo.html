@@ -96,7 +96,8 @@
     </div>
 
     <script>
-        const baseUrl = 'https://localhost:7108/api';
+        // Dynamic base URL - works for any port/environment
+        const baseUrl = `${window.location.origin}/api`;
 
         async function register() {
             const email = document.getElementById('email').value;

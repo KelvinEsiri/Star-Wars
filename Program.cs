@@ -4,6 +4,7 @@ using Microsoft.OpenApi.Models;
 using NLog;
 using NLog.Web;
 using AutoMapper;
+using Star_Wars.Configuration;
 using Star_Wars.Data;
 using Star_Wars.Models;
 using Star_Wars.Repositories.Implementations;
@@ -11,6 +12,7 @@ using Star_Wars.Repositories.Interfaces;
 using Star_Wars.Services.Implementations;
 using Star_Wars.Services.Interfaces;
 using Star_Wars.Middleware;
+using Star_Wars.Extensions;
 using FluentValidation.AspNetCore;
 
 // Early init of NLog to allow startup and exception logging, before host is built
@@ -45,6 +47,11 @@ try
     // Add Controllers and API configuration
     builder.Services.AddControllers();
     builder.Services.AddEndpointsApiExplorer();
+    
+    // Configure options from appsettings
+    builder.Services.Configure<DatabaseSeedingOptions>(
+        builder.Configuration.GetSection(DatabaseSeedingOptions.SectionName));
+    
     builder.Services.AddSwaggerGen(c =>
     {
         c.SwaggerDoc("v1", new OpenApiInfo { Title = "Star Wars API", Version = "v1" });
@@ -81,6 +88,7 @@ try
     builder.Services.AddScoped<IAuthService, AuthService>();
     builder.Services.AddScoped<IApiKeyService, ApiKeyService>();
     builder.Services.AddScoped<ISwapiService, SwapiService>();
+    builder.Services.AddScoped<IDatabaseSeederService, DatabaseSeederService>();
 
     var app = builder.Build();
 
@@ -92,12 +100,16 @@ try
     }
 
     app.UseHttpsRedirection();
+    app.UseStaticFiles(); // Enable static file serving from wwwroot
     app.UseMiddleware<ApiKeyMiddleware>();
 
     app.UseAuthentication();
     app.UseAuthorization();
 
     app.MapControllers();
+
+    // Initialize and seed database on startup
+    await app.InitializeDatabaseAsync();
 
     app.Run();
 }
