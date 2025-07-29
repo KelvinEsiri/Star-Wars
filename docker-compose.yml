@@ -1,0 +1,44 @@
+# Docker Compose configuration for Star Wars API
+
+services:
+  starwars-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:80"
+      - "8443:443"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=StarWarsDB;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True;Connection Timeout=30;Encrypt=False
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    networks:
+      - starwars-network
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - SA_PASSWORD=YourStrong!Passw0rd
+      - ACCEPT_EULA=Y
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    networks:
+      - starwars-network
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P YourStrong!Passw0rd -Q 'SELECT 1' -C || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+volumes:
+  sqlserver_data:
+
+networks:
+  starwars-network:
+    driver: bridge

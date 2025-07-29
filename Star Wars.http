@@ -1,6 +1,61 @@
-@Star_Wars_HostAddress = http://localhost:5007
+# Star Wars API Testing
 
-GET {{Star_Wars_HostAddress}}/weatherforecast/
-Accept: application/json
+@baseUrl = http://localhost:5296
+@apiKey = SW-API-KEY-2024-SECURE-ACCESS-TOKEN-12345
+
+### Register a new user
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "firstName": "Luke",
+  "lastName": "Skywalker",
+  "email": "luke@jedi.com",
+  "password": "Force123!"
+}
+
+### Login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "luke@jedi.com",
+  "password": "Force123!"
+}
+
+### Get Starships (Requires API Key)
+GET {{baseUrl}}/api/starships
+X-API-Key: {{apiKey}}
+
+### Get Starship by ID (Requires API Key)
+GET {{baseUrl}}/api/starships/1
+X-API-Key: {{apiKey}}
+
+### Seed Starships from SWAPI (Requires API Key)
+POST {{baseUrl}}/api/seed/starships
+X-API-Key: {{apiKey}}
+
+### Create a new Starship (Requires API Key)
+POST {{baseUrl}}/api/starships
+Content-Type: application/json
+X-API-Key: {{apiKey}}
+
+{
+  "name": "Test Starship",
+  "model": "T-65 X-wing",
+  "manufacturer": "Incom Corporation",
+  "costInCredits": "149999",
+  "length": "12.5",
+  "maxAtmospheringSpeed": "1050",
+  "crew": "1",
+  "passengers": "0",
+  "cargoCapacity": "110",
+  "consumables": "1 week",
+  "hyperdriveRating": "1.0",
+  "mglt": "100",
+  "starshipClass": "Starfighter",
+  "pilots": ["Luke Skywalker"],
+  "films": ["A New Hope"]
+}
 
 ###

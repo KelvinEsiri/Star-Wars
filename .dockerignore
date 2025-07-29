@@ -1,0 +1,142 @@
+# Docker ignore file for Star Wars API
+# This file excludes unnecessary files from Docker build context to optimize build performance
+
+# Build output directories (existing)
+bin/
+obj/
+*.user
+*.suo
+*.cache
+logs/
+.vs/
+.vscode/
+*.log
+appsettings.local.json
+
+# Additional build outputs
+out/
+publish/
+dist/
+**/bin/
+**/obj/
+**/out/
+**/publish/
+
+# Documentation files
+README.md
+CHANGELOG.md
+LICENSE
+*.md
+
+# Git files
+.git/
+.gitignore
+.gitattributes
+
+# Visual Studio and IDE files
+*.userosscache
+*.sln.docstates
+*.userprefs
+.idea/
+
+# Test results and coverage
+TestResults/
+[Tt]est[Rr]esult*/
+*.trx
+*.coverage
+*.coveragexml
+coverage/
+coveragereport/
+
+# Log files (additional patterns)
+nlog-*.log
+*.log.*
+
+# Database files (if any local db files)
+*.db
+*.sqlite
+*.mdf
+*.ldf
+
+# Package management
+packages/
+node_modules/
+*.nuget.props
+*.nuget.targets
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Environment and configuration files (sensitive)
+.env
+.env.local
+.env.production
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+
+# Temporary files
+*.tmp
+*.temp
+~$*
+Thumbs.db
+.DS_Store
+
+# Docker files (avoid recursion)
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# CI/CD files
+.github/
+.gitlab-ci.yml
+azure-pipelines.yml
+Jenkinsfile
+
+# Editor backup files
+*~
+*.swp
+*.swo
+*#
+.#*
+
+# OS generated files
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# Archives
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Certificates and keys (security)
+*.pfx
+*.p12
+*.key
+*.pem
+*.crt
+
+# Development tools
+.editorconfig
+.eslintrc*
+.prettierrc*
+
+# Backup files
+*.bak
+*.backup
+*.old
+
+# Include specific files that should be in Docker
+!wwwroot/
+!Views/
+!Controllers/
+!Models/
+!Services/
+!Data/
+!Properties/
+!appsettings.json
+!appsettings.Production.json

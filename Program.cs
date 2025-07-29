@@ -1,25 +1,117 @@
-var builder = WebApplication.CreateBuilder(args);
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
+using NLog;
+using NLog.Web;
+using AutoMapper;
+using Star_Wars.Data;
+using Star_Wars.Models;
+using Star_Wars.Repositories.Implementations;
+using Star_Wars.Repositories.Interfaces;
+using Star_Wars.Services.Implementations;
+using Star_Wars.Services.Interfaces;
+using Star_Wars.Middleware;
+using FluentValidation.AspNetCore;
 
-// Add services to the container.
+// Early init of NLog to allow startup and exception logging, before host is built
+var logger = NLog.LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
+logger.Debug("init main");
 
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+try
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    var builder = WebApplication.CreateBuilder(args);
+
+    // NLog: Setup NLog for Dependency injection
+    builder.Logging.ClearProviders();
+    builder.Host.UseNLog();
+
+    // Add services to the container.
+    builder.Services.AddDbContext<ApplicationDbContext>(options =>
+        options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+    // Add Identity
+    builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+    {
+        options.Password.RequireDigit = true;
+        options.Password.RequireLowercase = true;
+        options.Password.RequireUppercase = true;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequiredLength = 6;
+        options.User.RequireUniqueEmail = true;
+    })
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
+
+    // Add Controllers and API configuration
+    builder.Services.AddControllers();
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerGen(c =>
+    {
+        c.SwaggerDoc("v1", new OpenApiInfo { Title = "Star Wars API", Version = "v1" });
+        
+        // Simple API key authentication for Swagger
+        c.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
+        {
+            Description = "API Key: X-API-Key",
+            In = ParameterLocation.Header,
+            Name = "X-API-Key",
+            Type = SecuritySchemeType.ApiKey
+        });
+
+        c.AddSecurityRequirement(new OpenApiSecurityRequirement
+        {
+            {
+                new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "ApiKey" }
+                },
+                Array.Empty<string>()
+            }
+        });
+    });
+
+    // Register services
+    builder.Services.AddHttpClient();
+    builder.Services.AddAutoMapper(typeof(Program));
+    builder.Services.AddFluentValidationAutoValidation();
+    
+    // Repository and service registration
+    builder.Services.AddScoped<IStarshipRepository, StarshipRepository>();
+    builder.Services.AddScoped<IStarshipService, StarshipService>();
+    builder.Services.AddScoped<IAuthService, AuthService>();
+    builder.Services.AddScoped<IApiKeyService, ApiKeyService>();
+    builder.Services.AddScoped<ISwapiService, SwapiService>();
+
+    var app = builder.Build();
+
+    // Configure pipeline
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI();
+    }
+
+    app.UseHttpsRedirection();
+    app.UseMiddleware<ApiKeyMiddleware>();
+
+    app.UseAuthentication();
+    app.UseAuthorization();
+
+    app.MapControllers();
+
+    app.Run();
+}
+catch (Exception exception)
+{
+    // NLog: catch setup errors
+    logger.Error(exception, "Stopped program because of exception");
+    throw;
+}
+finally
+{
+    // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
+    NLog.LogManager.Shutdown();
 }
 
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
-
-app.Run();
+// Make Program class accessible for integration testing
+public partial class Program { }
