@@ -28,7 +28,7 @@ cd star-wars-api
 dotnet restore
 dotnet run
 ```
-Access at: https://localhost:7108
+Access at: http://localhost:5066
 
 ## 🌟 Key Features
 
@@ -82,9 +82,9 @@ dotnet run
 ```
 
 **Access Points:**
-- **API**: https://localhost:7108
-- **Swagger UI**: https://localhost:7108/swagger
-- **Health Check**: https://localhost:7108/health
+- **API**: http://localhost:5066
+- **Swagger UI**: http://localhost:5066/swagger
+- **Health Check**: http://localhost:5066/health
 
 ### 4. First Steps
 1. **Register**: Create an account at `/api/auth/register`
@@ -101,12 +101,12 @@ dotnet run
 **Quick Authentication Example:**
 ```bash
 # Register new user
-curl -X POST "https://localhost:7108/api/auth/register" \
+curl -X POST "http://localhost:5066/api/auth/register" \
   -H "Content-Type: application/json" \
   -d '{"firstName":"Luke","lastName":"Skywalker","email":"luke@jedi.com","password":"Password123!"}'
 
 # Use returned token for API calls
-curl -X GET "https://localhost:7108/api/starships" \
+curl -X GET "http://localhost:5066/api/starships" \
   -H "X-API-Key: [your-api-key-here]"
 ```
 
@@ -245,7 +245,7 @@ dotnet test --collect:"XPlat Code Coverage"
 dotnet ef database update
 
 # Test API authentication
-curl -X POST "https://localhost:7108/api/auth/login" \
+curl -X POST "http://localhost:5066/api/auth/login" \
   -H "Content-Type: application/json" \
   -d '{"email":"test@example.com","password":"Password123!"}'
 
