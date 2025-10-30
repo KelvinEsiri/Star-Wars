@@ -131,6 +131,7 @@ namespace Star_Wars.DTOs
         public bool SortDescending { get; set; } = false;
         public string? Manufacturer { get; set; }
         public string? StarshipClass { get; set; }
+        public int? Crew { get; set; }
         public bool? IsActive { get; set; }
     }
 

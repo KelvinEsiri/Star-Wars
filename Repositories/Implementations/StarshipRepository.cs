@@ -34,6 +34,11 @@ namespace Star_Wars.Repositories.Implementations
                 queryable = queryable.Where(s => s.Manufacturer == query.Manufacturer);
             }
 
+            if (query.Crew.HasValue)
+            {
+                queryable = queryable.Where(s => s.Crew < query.Crew);
+            }
+
             if (!string.IsNullOrEmpty(query.StarshipClass))
             {
                 queryable = queryable.Where(s => s.StarshipClass == query.StarshipClass);
@@ -52,6 +57,7 @@ namespace Star_Wars.Repositories.Implementations
                     "name" => query.SortDescending ? queryable.OrderByDescending(s => s.Name) : queryable.OrderBy(s => s.Name),
                     "model" => query.SortDescending ? queryable.OrderByDescending(s => s.Model) : queryable.OrderBy(s => s.Model),
                     "manufacturer" => query.SortDescending ? queryable.OrderByDescending(s => s.Manufacturer) : queryable.OrderBy(s => s.Manufacturer),
+                    "crew" => query.SortDescending ? queryable.OrderByDescending(s => s.Crew.ToString()) : queryable.OrderBy(s => s.Crew.ToString()),
                     "starshipclass" => query.SortDescending ? queryable.OrderByDescending(s => s.StarshipClass) : queryable.OrderBy(s => s.StarshipClass),
                     "created" => query.SortDescending ? queryable.OrderByDescending(s => s.CreatedAt) : queryable.OrderBy(s => s.CreatedAt),
                     _ => queryable.OrderBy(s => s.Name)

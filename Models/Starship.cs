@@ -26,7 +26,7 @@ namespace Star_Wars.Models
         public string? MaxAtmospheringSpeed { get; set; }
         
         [MaxLength(10)]
-        public string? Crew { get; set; }
+        public int? Crew { get; set; }
         
         [MaxLength(20)]
         public string? Passengers { get; set; }
